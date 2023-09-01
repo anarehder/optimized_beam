@@ -1,0 +1,46 @@
+#IncludeRegexLine: ^[ 	]*[#%][ 	]*(include|import)[ 	]*[<"]([^">]+)([">])
+
+#IncludeRegexScan: ^.*$
+
+#IncludeRegexComplain: ^$
+
+#IncludeRegexTransform: 
+
+/home/ana/Algoritimo_Genetico_1/funcoes.h
+
+/home/ana/Algoritimo_Genetico_1/main.cpp
+iostream
+-
+array
+-
+deque
+-
+fstream
+-
+iostream
+-
+chrono
+-
+stdio.h
+-
+stdlib.h
+-
+string.h
+-
+time.h
+-
+list
+-
+cmath
+-
+unistd.h
+-
+random
+-
+set
+-
+funcoes.h
+/home/ana/Algoritimo_Genetico_1/funcoes.h
+corrosaoAnisotropica.h
+/home/ana/Algoritimo_Genetico_1/corrosaoAnisotropica.h
+
