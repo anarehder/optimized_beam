@@ -32,7 +32,7 @@ Clone o repositorio e rode na pasta build o comando abaixo:
 ```bash
     git clone https://github.com/anarehder/genetic-alg-beam.git
     cd genetic-alg-beam
-    mkdir build && cd build
+    cd build
     cmake .. -DCMAKE_INSTALL_PREFIX=/path/to/your/custom/install/
     make
     ./Algoritimo_Genetico_5
