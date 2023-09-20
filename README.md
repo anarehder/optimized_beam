@@ -1,7 +1,7 @@
 
-## Algoritmo Genético para corrosão anisotrópica de silicio
+# Algoritmo Genético para corrosão anisotrópica de silício
 
-Você precisa ter instalado no seu computador:
+## Você precisa ter instalado no seu computador:
 
 
 ## Vienna 

@@ -1,11 +1,11 @@
-build/CMakeFiles
-build/Algoritimo_Genetico_5
-build/ARQ_FINAL.vtp
-build/CMakeCache.txt
-build/cmake_install.cmake
-build/Makefile
-build/MASK.vtp
-build/subtraido.stl
-build/teste.stl
-build/teste.vtu
-build/volume_anterior.txt
+# Ignore todos os arquivos na subpasta 'subpasta_que_quer_preservar'
+build/*
+
+# Exceto o arquivo que você deseja incluir
+!build/DIFFERENCE.scad
+!build/DISP_IDEAL.stl
+!build/makeSTL.py
+!build/openscad
+!build/volume.py
+!build/Vtp Reader.py
+!build/vtpToSTL.py
