@@ -19,6 +19,7 @@
 #include <random>
 #include <set>
 #include <vector>
+#include <thread>
 
 #include <lsAdvect.hpp>
 #include <lsBooleanOperation.hpp>
@@ -40,10 +41,11 @@
 using namespace std;
 
 const int ARRAY_SIZE = 36;
-const int POPULATION_SIZE = 12;
+const int INITIAL_POPULATION_SIZE = 100;//150;
+const int POPULATION_SIZE = 32; //45;
 const int MAX_GENERATIONS = 1000;
-const double stopFitness = 0.1;
-const int SELECTED = 4;
+const double stopFitness = 1;
+const int SELECTED = 8;//15;
 double bestAllFitness;
 bool parada = false;
 
@@ -179,9 +181,91 @@ std::vector<int> generateRandomArray()
     return array;
 }
 
+double comparaVolume1()
+{
+    // FAZENDO A COMPARAÇÃO
+    int res2;
+    res2 = system("openscad -o DISP_SUBTRAIDO.stl DIFFERENCE.scad");
+
+    // CALCULANDO O VOLUME
+    int res3;
+    // res3 = system("jupyter nbconvert --to notebook --execute volume.ipynb");
+    res3 = system("python3 volume.py");
+
+    // OBTENDO O VOLUME CALCULADO
+    // FAZER O CALCULO IGUAL O LER ARQ
+    char texto[100];
+    char *result;
+    int ip;
+
+    // para declarar um arquivo
+    FILE *fp;
+
+    // MODELO - fp = fopen(const char filename,const char mode);
+    fp = fopen("VOLUME.txt", "r");
+
+    if (fp == NULL) // Se houve erro na abertura
+    {
+        printf("Problemas na abertura do arquivo\n");
+    }
+
+    while (!feof(fp)) /* Enquanto não se chegar no final do arquivo */
+    {
+        result = fgets(texto, 100, fp); // o 'fgets' lê até 99 caracteres ou até o '\n'
+    }
+
+    double VOLUME = atof(texto);
+    printf("Volume é %f\n", VOLUME);
+    fclose(fp);
+
+    return VOLUME;
+}
+
+double comparaVolume2()
+{
+    // FAZENDO A COMPARAÇÃO
+    int com1;
+    com1 = system("openscad -o DISP_SUBTRAIDO2.stl DIFFERENCE2.scad");
+
+    // CALCULANDO O VOLUME
+    int com2;
+    // res3 = system("jupyter nbconvert --to notebook --execute volume.ipynb");
+    com2 = system("python3 volume2.py");
+
+    // OBTENDO O VOLUME CALCULADO
+    // FAZER O CALCULO IGUAL O LER ARQ
+    char texto[100];
+    char *result;
+    int ip;
+
+    // para declarar um arquivo
+    FILE *fp;
+
+    // MODELO - fp = fopen(const char filename,const char mode);
+    fp = fopen("VOLUME2.txt", "r");
+
+    if (fp == NULL) // Se houve erro na abertura
+    {
+        printf("Problemas na abertura do arquivo\n");
+    }
+
+    while (!feof(fp)) /* Enquanto não se chegar no final do arquivo */
+    {
+        result = fgets(texto, 100, fp); // o 'fgets' lê até 99 caracteres ou até o '\n'
+    }
+
+    double VOLUME2 = atof(texto);
+    printf("Volume 2 é %f\n", VOLUME2);
+    fclose(fp);
+
+    return VOLUME2;
+}
+
 // Função para calcular a aptidão de um indivíduo (quanto menor, melhor)
 double calculateFitness(std::vector<int> positions)
 {
+    std::cout << "" << std::endl;
+    std::cout << "" << std::endl;
     std::cout << "Fitness: " << std::endl;
     omp_set_num_threads(24);
 
@@ -251,7 +335,7 @@ double calculateFitness(std::vector<int> positions)
 
     lsBooleanOperation(substrate, mask, lsBooleanOperationEnum::UNION).apply();
 
-    std::vector<double> epiVels = {0, 16};
+    std::vector<double> epiVels = {0, 15.95};
     auto velocity = lsSmartPointer<WetEtch>::New(epiVels);
 
     std::vector<LevelSetType> LSs;
@@ -306,48 +390,18 @@ double calculateFitness(std::vector<int> positions)
 
     // ALTERANDO PARA STL
     int res1;
-    //res1 = system("jupyter nbconvert --to notebook --execute makeSTL.ipynb");
+    // res1 = system("jupyter nbconvert --to notebook --execute makeSTL.ipynb");
     res1 = system("python3 makeSTL.py");
-    // FAZENDO A COMPARAÇÃO
-    int res2;
-    res2 = system("openscad -o DISP_SUBTRAIDO.stl DIFFERENCE.scad");
 
-    // CALCULANDO O VOLUME
-    int res3;
-    //res3 = system("jupyter nbconvert --to notebook --execute volume.ipynb");
-    res3 = system("python3 volume.py");
+    // VOLUMES
+    double volume1 = comparaVolume1();
+    double volume2 = comparaVolume2();
 
-    // OBTENDO O VOLUME CALCULADO
-    // FAZER O CALCULO IGUAL O LER ARQ
-    char texto[100];
-    char *result;
-    int ip;
-
-    // para declarar um arquivo
-    FILE *fp;
-
-    // MODELO - fp = fopen(const char filename,const char mode);
-    fp = fopen("VOLUME.txt", "r");
-
-    if (fp == NULL) // Se houve erro na abertura
-    {
-        printf("Problemas na abertura do arquivo\n");
-    }
-
-    while (!feof(fp)) /* Enquanto não se chegar no final do arquivo */
-    {
-        result = fgets(texto, 100, fp); // o 'fgets' lê até 99 caracteres ou até o '\n'
-    }
-
-    double VOLUME = atof(texto);
-    printf("Volume é %f\n", VOLUME);
-    fclose(fp);
-
-    int res4 = system("mv DISP_TESTE.vtu teste.vtu");
-    int res5 = system("mv DISP_TESTE.stl teste.stl");
-    int res6 = system("mv DISP_SUBTRAIDO.stl subtraido.stl");
-    int res7 = system("mv VOLUME.txt volume_anterior.txt");
-    return VOLUME;
+    double difVol = (volume1 + volume2) / 2;
+    printf("\n");
+    printf("A DIFERENÇA DE VOLUME É %f\n", difVol);
+    printf("\n");
+    return difVol;
 }
 
 // Função para selecionar um indivíduo da população com base em suas aptidões
@@ -400,7 +454,7 @@ std::vector<int> crossover2(const std::vector<int> &parent1, const std::vector<i
     int crossoverPoint = rand() % ARRAY_SIZE;
     // olho ponto a ponto, quero pegar ametade final do pai 2 e a metade inicial do pai 1 em ordem trocada
     for (int i = 0; i < ARRAY_SIZE; i++)
-    {   
+    {
         int ponto = ARRAY_SIZE - 1 - i;
         if (i < crossoverPoint)
         {
@@ -414,12 +468,42 @@ std::vector<int> crossover2(const std::vector<int> &parent1, const std::vector<i
     return child;
 }
 
+std::vector<int> uniformCrossover(const std::vector<int> &parent1, const std::vector<int> &parent2)
+{
+    std::vector<int> child(parent1.size());
+
+    // Gerador de números aleatórios
+    std::random_device rd;
+    std::mt19937 gen(rd());
+    std::uniform_int_distribution<int> distribution(0, 1);
+
+    // Realiza o cruzamento
+    for (int i = 0; i < parent1.size(); i++)
+    {
+        // Escolhe aleatoriamente de qual pai o gene será herdado
+        int sourceParent = distribution(gen);
+        if (sourceParent == 0)
+        {
+            child[i] = parent1[i];
+        }
+        else
+        {
+            child[i] = parent2[i];
+        }
+    }
+
+    return child;
+}
 // Função para realizar uma mutação em um indivíduo - altera de 0 para 1
 void mutate(std::vector<int> &individual)
 {
-    std::cout << "Mutação: " << std::endl;
+    //std::cout << "Mutação: " << std::endl;
     int max = ARRAY_SIZE - 1;
+    
+    std::this_thread::sleep_for(std::chrono::seconds(1));
     int mutationPoint = rand() % ARRAY_SIZE;
+
+    std::cout << "Mutação: " << mutationPoint << std::endl;
     if (individual[mutationPoint] == 1)
     {
         individual[mutationPoint] = 0;
@@ -438,7 +522,7 @@ int main()
 
     // Criação da população inicial Array com 8 vetores de 16 pontos
     std::vector<std::vector<int>> population;
-    for (int i = 0; i < POPULATION_SIZE; i++)
+    for (int i = 0; i < INITIAL_POPULATION_SIZE; i++)
     {
         population.push_back(generateRandomArray());
     }
@@ -448,29 +532,48 @@ int main()
     {
         // Avaliação da população atual
         std::vector<double> allFitness;
-
-        for (int i = 0; i < POPULATION_SIZE; i++)
+        if (generation == 0)
         {
-            double fitness = calculateFitness(population[i]);
-            allFitness.push_back(fitness); // o array all fitness tem os mesmos indices do array population
-            // ou seja, 1o individuo é population[0] e allFitness[0]
-            if (fitness < stopFitness)
+            for (int i = 0; i < INITIAL_POPULATION_SIZE; i++)
             {
-                bestAllFitness = fitness;
-                std::cout << "Generation: " << generation << std::endl;
-                cout << "Estrutura final encontrada, com diferença de volume = " << bestAllFitness << endl;
-                parada = true;
-                /* allFitness = population[i]; */
-                break;
+                double fitness = calculateFitness(population[i]);
+                allFitness.push_back(fitness); // o array all fitness tem os mesmos indices do array population
+                // ou seja, 1o individuo é population[0] e allFitness[0]
+                if (fitness < stopFitness)
+                {
+                    bestAllFitness = fitness;
+                    std::cout << "Generation: " << generation << std::endl;
+                    cout << "Estrutura final encontrada, com diferença de volume = " << bestAllFitness << endl;
+                    parada = true;
+                    break;
+                }
             }
         }
+        else
+        {
+            for (int i = 0; i < POPULATION_SIZE; i++)
+            {
+                double fitness = calculateFitness(population[i]);
+                allFitness.push_back(fitness); // o array all fitness tem os mesmos indices do array population
+                // ou seja, 1o individuo é population[0] e allFitness[0]
+                if (fitness < stopFitness)
+                {
+                    bestAllFitness = fitness;
+                    std::cout << "Generation: " << generation << std::endl;
+                    cout << "Estrutura final encontrada, com diferença de volume = " << bestAllFitness << endl;
+                    parada = true;
+                    break;
+                }
+            }
+        }
+
         if (parada == true)
         {
             break;
         }
-        std::vector<int> bestFitness = selection(allFitness); // seleciona os 4 melhores fitness e guarda seus indices aqui.
+        std::vector<int> bestFitness = selection(allFitness); // seleciona os melhores fitness e guarda seus indices aqui.
 
-        for (int i = 0; i < 4; i++)
+        for (int i = 0; i < SELECTED; i++)
         {
             std::cout << bestFitness[i] << ' ';
         }
@@ -483,15 +586,17 @@ int main()
         for (int i = 0; i < SELECTED; i++)
         {
             int indice1 = bestFitness[i];
-            int indice2 = bestFitness[i + 1];
-            if (indice2 == SELECTED)
+            int indice2;
+            if ((i + 1) == SELECTED)
             {
-                indice2 = 0;
+                indice2 = bestFitness[0];
+            } else {
+                indice2 = bestFitness[i + 1];
             }
             std::vector<int> parent1 = population[indice1];
             std::vector<int> parent2 = population[indice2];
             std::vector<int> child = crossover1(parent1, parent2);
-            mutate(child);
+            //mutate(child);
             newPopulation.push_back(child);
             for (int i = 0; i < ARRAY_SIZE; i++)
             {
@@ -502,15 +607,38 @@ int main()
         for (int i = 0; i < SELECTED; i++)
         {
             int indice1 = bestFitness[i];
-            int indice2 = bestFitness[i + 1];
-            if (indice2 == SELECTED)
+            int indice2;
+            if ((i + 1) == SELECTED)
             {
-                indice2 = 0;
+                indice2 = bestFitness[0];
+            } else {
+                indice2 = bestFitness[i + 1];
             }
             std::vector<int> parent1 = population[indice1];
             std::vector<int> parent2 = population[indice2];
             std::vector<int> child = crossover2(parent1, parent2);
-            mutate(child);
+            //mutate(child);
+            newPopulation.push_back(child);
+            for (int i = 0; i < ARRAY_SIZE; i++)
+            {
+                std::cout << child[i] << ' ';
+            }
+            std::cout << ' ' << std::endl;
+        }
+        for (int i = 0; i < SELECTED; i++)
+        {
+            int indice1 = bestFitness[i];
+            int indice2;
+            if ((i + 1) == SELECTED)
+            {
+                indice2 = bestFitness[0];
+            } else {
+                indice2 = bestFitness[i + 1];
+            }
+            std::vector<int> parent1 = population[indice1];
+            std::vector<int> parent2 = population[indice2];
+            std::vector<int> child = uniformCrossover(parent1, parent2);
+            //mutate(child);
             newPopulation.push_back(child);
             for (int i = 0; i < ARRAY_SIZE; i++)
             {
@@ -522,8 +650,10 @@ int main()
         {
             int indice = bestFitness[i];
             std::vector<int> actualPopulation = population[indice];
-            mutate(actualPopulation);
-            mutate(actualPopulation);
+            for (int i = 0; i < 2; i++)
+            {
+                mutate(actualPopulation);
+            }
             newPopulation.push_back(actualPopulation);
             for (int i = 0; i < ARRAY_SIZE; i++)
             {

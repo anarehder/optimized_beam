@@ -3,9 +3,11 @@ build/*
 
 # Exceto o arquivo que você deseja incluir
 !build/DIFFERENCE.scad
+!build/DIFFERENCE2.scad
 !build/DISP_IDEAL.stl
 !build/makeSTL.py
 !build/openscad
 !build/volume.py
+!build/volume2.py
 !build/Vtp Reader.py
 !build/vtpToSTL.py

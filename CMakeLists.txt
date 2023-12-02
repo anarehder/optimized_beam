@@ -1,6 +1,6 @@
 cmake_minimum_required(VERSION 3.4)
 
-project("Algoritimo_Genetico_5")
+project("Algoritimo_Genetico_8")
 
 ## Enable Clang sanitizer for debug builds
 if ("${CMAKE_CXX_COMPILER_ID}" STREQUAL "Clang")
