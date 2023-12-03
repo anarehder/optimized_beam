@@ -41,11 +41,11 @@
 using namespace std;
 
 const int ARRAY_SIZE = 36;
-const int INITIAL_POPULATION_SIZE = 100;//150;
-const int POPULATION_SIZE = 32; //45;
+const int INITIAL_POPULATION_SIZE = 150;
+const int POPULATION_SIZE = 32;
 const int MAX_GENERATIONS = 1000;
 const double stopFitness = 1;
-const int SELECTED = 8;//15;
+const int SELECTED = 8;
 double bestAllFitness;
 bool parada = false;
 
@@ -448,24 +448,42 @@ std::vector<int> crossover1(const std::vector<int> &parent1, const std::vector<i
 
 std::vector<int> crossover2(const std::vector<int> &parent1, const std::vector<int> &parent2)
 {
-    std::cout << "Cruzamento: " << std::endl;
-    std::vector<int> child;
-    // posso optar por quebrar sempre ao meio ou deixar aleatório
-    int crossoverPoint = rand() % ARRAY_SIZE;
-    // olho ponto a ponto, quero pegar ametade final do pai 2 e a metade inicial do pai 1 em ordem trocada
-    for (int i = 0; i < ARRAY_SIZE; i++)
-    {
-        int ponto = ARRAY_SIZE - 1 - i;
-        if (i < crossoverPoint)
-        {
-            child.push_back(parent2[ponto]);
-        }
-        else
-        {
-            child.push_back(parent1[ponto]);
-        }
+    std::vector<int> child(parent1.size());
+
+    // Gerador de números aleatórios para escolher os pontos de corte
+    std::random_device rd;
+    std::mt19937 gen(rd());
+    std::uniform_int_distribution<int> distribution(1, parent1.size() - 2); // Evita o primeiro e o último índice
+
+    // Escolhe aleatoriamente os dois pontos de corte
+    int crossoverPoint1 = distribution(gen);
+    int crossoverPoint2 = distribution(gen);
+    
+    // Garante que os pontos de corte são distintos
+    while (crossoverPoint1 == crossoverPoint2) {
+        crossoverPoint2 = distribution(gen);
     }
-    return child;
+
+    // Garante que crossoverPoint1 < crossoverPoint2
+    if (crossoverPoint1 > crossoverPoint2) {
+        std::swap(crossoverPoint1, crossoverPoint2);
+    }
+
+    // Realiza o cruzamento entre os dois pontos
+    for (int i = 0; i < crossoverPoint1; i++)
+    {
+        child[i] = parent1[i];
+    }
+
+    for (int i = crossoverPoint1; i < crossoverPoint2; i++)
+    {
+        child[i] = parent2[i];
+    }
+
+    for (int i = crossoverPoint2; i < parent1.size(); i++)
+    {
+        child[i] = parent1[i];
+    }
 }
 
 std::vector<int> uniformCrossover(const std::vector<int> &parent1, const std::vector<int> &parent2)
@@ -508,7 +526,7 @@ void mutate(std::vector<int> &individual)
     {
         individual[mutationPoint] = 0;
     }
-    if (individual[mutationPoint] == 0)
+    else if (individual[mutationPoint] == 0)
     {
         individual[mutationPoint] = 1;
     }
