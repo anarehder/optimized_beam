@@ -484,6 +484,7 @@ std::vector<int> crossover2(const std::vector<int> &parent1, const std::vector<i
     {
         child[i] = parent1[i];
     }
+    return child;
 }
 
 std::vector<int> uniformCrossover(const std::vector<int> &parent1, const std::vector<int> &parent2)
