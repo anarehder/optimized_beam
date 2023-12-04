@@ -44,11 +44,12 @@ const int ARRAY_SIZE = 36;
 const int INITIAL_POPULATION_SIZE = 150;
 const int POPULATION_SIZE = 32;
 const int MAX_GENERATIONS = 1000;
-const double stopFitness = 1;
+const double stopFitness = 4;
+const double stopFitnessV1 = 4;
 const int SELECTED = 8;
 double bestAllFitness;
 bool parada = false;
-
+bool paradav1 = false;
 constexpr int D = 3;
 using NumericType = double;
 constexpr NumericType gridDelta = 0.5; // 0.2; //0.51; //0.51;//0.27;//0.92;
@@ -215,8 +216,13 @@ double comparaVolume1()
     }
 
     double VOLUME = atof(texto);
-    printf("Volume é %f\n", VOLUME);
+    printf("Volume 1 é %f\n", VOLUME);
     fclose(fp);
+    if (VOLUME < stopFitnessV1){
+        paradav1 = true;
+    } else {
+        paradav1 = false;
+    }
 
     return VOLUME;
 }
@@ -427,7 +433,7 @@ std::vector<int> selection(const std::vector<double> &allFitness)
 // Função para realizar o crossover entre dois indivíduos
 std::vector<int> crossover1(const std::vector<int> &parent1, const std::vector<int> &parent2)
 {
-    std::cout << "Cruzamento: " << std::endl;
+    //std::cout << "Cruzamento: " << std::endl;
     std::vector<int> child;
     // posso optar por quebrar sempre ao meio ou deixar aleatório
     int crossoverPoint = rand() % ARRAY_SIZE;
@@ -522,7 +528,7 @@ void mutate(std::vector<int> &individual)
     std::this_thread::sleep_for(std::chrono::seconds(1));
     int mutationPoint = rand() % ARRAY_SIZE;
 
-    std::cout << "Mutação: " << mutationPoint << std::endl;
+    //std::cout << "Mutação: " << mutationPoint << std::endl;
     if (individual[mutationPoint] == 1)
     {
         individual[mutationPoint] = 0;
@@ -558,7 +564,7 @@ int main()
                 double fitness = calculateFitness(population[i]);
                 allFitness.push_back(fitness); // o array all fitness tem os mesmos indices do array population
                 // ou seja, 1o individuo é population[0] e allFitness[0]
-                if (fitness < stopFitness)
+                if (fitness < stopFitness && paradav1 == true)
                 {
                     bestAllFitness = fitness;
                     std::cout << "Generation: " << generation << std::endl;
@@ -575,7 +581,7 @@ int main()
                 double fitness = calculateFitness(population[i]);
                 allFitness.push_back(fitness); // o array all fitness tem os mesmos indices do array population
                 // ou seja, 1o individuo é population[0] e allFitness[0]
-                if (fitness < stopFitness)
+                if (fitness < stopFitness && paradav1 == true)
                 {
                     bestAllFitness = fitness;
                     std::cout << "Generation: " << generation << std::endl;
