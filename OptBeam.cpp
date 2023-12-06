@@ -40,7 +40,7 @@
 
 using namespace std;
 
-const int ARRAY_SIZE = 36;
+const int ARRAY_SIZE = 72;
 const int INITIAL_POPULATION_SIZE = 150;
 const int POPULATION_SIZE = 32;
 const int MAX_GENERATIONS = 1000;
@@ -218,9 +218,12 @@ double comparaVolume1()
     double VOLUME = atof(texto);
     printf("Volume 1 é %f\n", VOLUME);
     fclose(fp);
-    if (VOLUME < stopFitnessV1){
+    if (VOLUME < stopFitnessV1)
+    {
         paradav1 = true;
-    } else {
+    }
+    else
+    {
         paradav1 = false;
     }
 
@@ -276,11 +279,13 @@ double calculateFitness(std::vector<int> positions)
     omp_set_num_threads(24);
 
     LevelSetType substrate;
-    hrleCoordType extent = 20;
-    int dimensao = 6;
+    hrleCoordType extentX = 35;
+    hrleCoordType extentY = 20;
+    int dimensaoX = 12;
+    int dimensaoY = 6;
 
     {
-        hrleCoordType bounds[2 * D] = {-extent, extent, -extent, extent};
+        hrleCoordType bounds[2 * D] = {-extentX, extentX, -extentY, extentY};
         lsDomain<NumericType, D>::BoundaryType boundaryCons[D];
         boundaryCons[0] = lsDomain<NumericType, D>::BoundaryType::PERIODIC_BOUNDARY;
         boundaryCons[1] = lsDomain<NumericType, D>::BoundaryType::PERIODIC_BOUNDARY;
@@ -318,16 +323,17 @@ double calculateFitness(std::vector<int> positions)
             {
                 int block = i + 1;
                 hrleCoordType block_double = static_cast<hrleCoordType>(block);
-                hrleCoordType dimensao_double = static_cast<hrleCoordType>(dimensao);
+                hrleCoordType dimensao_double = static_cast<hrleCoordType>(dimensaoY);
                 hrleCoordType calculoX = static_cast<hrleCoordType>(std::ceil(block_double / dimensao_double));
-                hrleCoordType calculoY = static_cast<hrleCoordType>(block % dimensao);
-                hrleCoordType coordX = -extent + (calculoX * 5);
-                hrleCoordType coordY = -extent + (calculoY * 5);
+                hrleCoordType calculoY = static_cast<hrleCoordType>(block % dimensaoY);
+                hrleCoordType coordX = -extentX + (calculoX * 5);
+                hrleCoordType coordY = -extentY + (calculoY * 5);
                 if (calculoY == 0)
                 {
-                    coordY = (extent - 10);
+                    coordY = -extentY + ((dimensaoY - 1) * 5);
                 }
-
+                /* std::cout << "X! " << coordX << std::endl;
+                std::cout << "Y! " << coordY << std::endl; */
                 hrleCoordType minCorner[D] = {coordX, coordY, -1.};
                 hrleCoordType maxCorner[D] = {coordX + 5, coordY + 5, 3.};
 
@@ -373,8 +379,27 @@ double calculateFitness(std::vector<int> positions)
     planeNormal[D - 1] = 1.;
     auto plane1 = LevelSetType::New(mask->getGrid());
     lsMakeGeometry(plane1, lsSmartPointer<lsPlane<NumericType, D>>::New(origin, planeNormal)).apply();
-
     lsBooleanOperation(substrate, plane1, lsBooleanOperationEnum::INTERSECT).apply();
+
+    std::cout << "passei aqui! " << std::endl;
+    NumericType origin2[D] = {};
+    origin2[D - 1] = -2.;
+    NumericType planeNormal2[D] = {};
+    planeNormal2[D - 1] = -1.;
+    auto plane2 = LevelSetType::New(substrate->getGrid());
+    lsMakeGeometry(plane2, lsSmartPointer<lsPlane<NumericType, D>>::New(origin2, planeNormal2)).apply();
+
+    lsBooleanOperation(substrate, plane2, lsBooleanOperationEnum::INTERSECT).apply();
+
+    hrleCoordType minCorner2[D] = {-30., -15., -1.};
+    hrleCoordType maxCorner2[D] = {30, 15., -2.};
+
+    auto box = LevelSetType::New(mask->getGrid());
+
+    auto boxFinal = makeBox(minCorner2, maxCorner2, 0.);
+    lsFromSurfaceMesh(box, boxFinal).apply();
+    lsBooleanOperation(substrate, box, lsBooleanOperationEnum::RELATIVE_COMPLEMENT).apply();
+
     writeSurface(substrate, "ARQ_FINAL.vtp");
 
     lsWriteVisualizationMesh<NumericType, D> visMesh;
@@ -433,7 +458,7 @@ std::vector<int> selection(const std::vector<double> &allFitness)
 // Função para realizar o crossover entre dois indivíduos
 std::vector<int> crossover1(const std::vector<int> &parent1, const std::vector<int> &parent2)
 {
-    //std::cout << "Cruzamento: " << std::endl;
+    // std::cout << "Cruzamento: " << std::endl;
     std::vector<int> child;
     // posso optar por quebrar sempre ao meio ou deixar aleatório
     int crossoverPoint = rand() % ARRAY_SIZE;
@@ -464,14 +489,16 @@ std::vector<int> crossover2(const std::vector<int> &parent1, const std::vector<i
     // Escolhe aleatoriamente os dois pontos de corte
     int crossoverPoint1 = distribution(gen);
     int crossoverPoint2 = distribution(gen);
-    
+
     // Garante que os pontos de corte são distintos
-    while (crossoverPoint1 == crossoverPoint2) {
+    while (crossoverPoint1 == crossoverPoint2)
+    {
         crossoverPoint2 = distribution(gen);
     }
 
     // Garante que crossoverPoint1 < crossoverPoint2
-    if (crossoverPoint1 > crossoverPoint2) {
+    if (crossoverPoint1 > crossoverPoint2)
+    {
         std::swap(crossoverPoint1, crossoverPoint2);
     }
 
@@ -522,13 +549,13 @@ std::vector<int> uniformCrossover(const std::vector<int> &parent1, const std::ve
 // Função para realizar uma mutação em um indivíduo - altera de 0 para 1
 void mutate(std::vector<int> &individual)
 {
-    //std::cout << "Mutação: " << std::endl;
+    // std::cout << "Mutação: " << std::endl;
     int max = ARRAY_SIZE - 1;
-    
+
     std::this_thread::sleep_for(std::chrono::seconds(1));
     int mutationPoint = rand() % ARRAY_SIZE;
 
-    //std::cout << "Mutação: " << mutationPoint << std::endl;
+    // std::cout << "Mutação: " << mutationPoint << std::endl;
     if (individual[mutationPoint] == 1)
     {
         individual[mutationPoint] = 0;
@@ -615,13 +642,15 @@ int main()
             if ((i + 1) == SELECTED)
             {
                 indice2 = bestFitness[0];
-            } else {
+            }
+            else
+            {
                 indice2 = bestFitness[i + 1];
             }
             std::vector<int> parent1 = population[indice1];
             std::vector<int> parent2 = population[indice2];
             std::vector<int> child = crossover1(parent1, parent2);
-            //mutate(child);
+            // mutate(child);
             newPopulation.push_back(child);
             for (int i = 0; i < ARRAY_SIZE; i++)
             {
@@ -636,13 +665,15 @@ int main()
             if ((i + 1) == SELECTED)
             {
                 indice2 = bestFitness[0];
-            } else {
+            }
+            else
+            {
                 indice2 = bestFitness[i + 1];
             }
             std::vector<int> parent1 = population[indice1];
             std::vector<int> parent2 = population[indice2];
             std::vector<int> child = crossover2(parent1, parent2);
-            //mutate(child);
+            // mutate(child);
             newPopulation.push_back(child);
             for (int i = 0; i < ARRAY_SIZE; i++)
             {
@@ -657,13 +688,15 @@ int main()
             if ((i + 1) == SELECTED)
             {
                 indice2 = bestFitness[0];
-            } else {
+            }
+            else
+            {
                 indice2 = bestFitness[i + 1];
             }
             std::vector<int> parent1 = population[indice1];
             std::vector<int> parent2 = population[indice2];
             std::vector<int> child = uniformCrossover(parent1, parent2);
-            //mutate(child);
+            // mutate(child);
             newPopulation.push_back(child);
             for (int i = 0; i < ARRAY_SIZE; i++)
             {
