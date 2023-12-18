@@ -381,24 +381,13 @@ double calculateFitness(std::vector<int> positions)
     lsMakeGeometry(plane1, lsSmartPointer<lsPlane<NumericType, D>>::New(origin, planeNormal)).apply();
     lsBooleanOperation(substrate, plane1, lsBooleanOperationEnum::INTERSECT).apply();
 
-    std::cout << "passei aqui! " << std::endl;
     NumericType origin2[D] = {};
     origin2[D - 1] = -2.;
     NumericType planeNormal2[D] = {};
     planeNormal2[D - 1] = -1.;
     auto plane2 = LevelSetType::New(substrate->getGrid());
     lsMakeGeometry(plane2, lsSmartPointer<lsPlane<NumericType, D>>::New(origin2, planeNormal2)).apply();
-
     lsBooleanOperation(substrate, plane2, lsBooleanOperationEnum::INTERSECT).apply();
-
-    hrleCoordType minCorner2[D] = {-30., -15., -1.};
-    hrleCoordType maxCorner2[D] = {30, 15., -2.};
-
-    auto box = LevelSetType::New(mask->getGrid());
-
-    auto boxFinal = makeBox(minCorner2, maxCorner2, 0.);
-    lsFromSurfaceMesh(box, boxFinal).apply();
-    lsBooleanOperation(substrate, box, lsBooleanOperationEnum::RELATIVE_COMPLEMENT).apply();
 
     writeSurface(substrate, "ARQ_FINAL.vtp");
 
