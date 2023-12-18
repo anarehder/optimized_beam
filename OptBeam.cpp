@@ -725,7 +725,13 @@ int main()
         {
             int indice = bestFitness[i];
             std::vector<int> actualPopulation = population[indice];
-            for (int i = 0; i < 2; i++)
+            int qntMutation;
+            if (allFitness[0] > 100){
+                qntMutation = SELECTED;
+            } else {
+                qntMutation = SELECTED/2;
+            }
+            for (int i = 0; i < qntMutation; i++)
             {
                 mutate(actualPopulation);
             }
