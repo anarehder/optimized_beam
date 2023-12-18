@@ -7,7 +7,7 @@ reader.Update()
 
 # Criar uma caixa delimitadora para a área desejada
 bounding_box = vtk.vtkBox()
-bounding_box.SetBounds(-29.5, 29.5, -14.5, 14.5, -1000, 1000)  # Ajuste conforme necessário
+bounding_box.SetBounds(-28.5, 28.5, -13.5, 13.5, -1000, 1000)  # Ajuste conforme necessário
 
 # Filtro de recorte para a área delimitada pela caixa
 clip_box = vtk.vtkClipDataSet()
