@@ -605,8 +605,25 @@ int main()
         {
             for (int i = 0; i < POPULATION_SIZE; i++)
             {
-                double fitness = calculateFitness(population[i]);
-                allFitness.push_back(fitness); // o array all fitness tem os mesmos indices do array population
+                bool foundDuplicate = false;
+                // Verifica se o vetor atual já ocorreu antes na iteração
+                for (size_t j = 0; j < i; ++j)
+                {
+                    if (population[i] == population[j])
+                    {
+                        // Vetor duplicado encontrado
+                        foundDuplicate = true;
+                        // Adiciona o valor correspondente em allFitness ao vetor fitness
+                        allFitness.push_back(allFitness[j]);
+                        break; // Não é necessário procurar mais
+                    }
+                }
+                if (!foundDuplicate)
+                {
+                    double fitness = calculateFitness(population[i]);
+                    allFitness.push_back(fitness);
+                }
+                // o array all fitness tem os mesmos indices do array population
                 // ou seja, 1o individuo é population[0] e allFitness[0]
                 if (fitness < stopFitness && paradav1 == true)
                 {
