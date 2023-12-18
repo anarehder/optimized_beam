@@ -611,16 +611,16 @@ int main()
                 {
                     double fitness = calculateFitness(population[i]);
                     allFitness.push_back(fitness);
-                }
-                // o array all fitness tem os mesmos indices do array population
-                // ou seja, 1o individuo é population[0] e allFitness[0]
-                if (fitness < stopFitness && paradav1 == true)
-                {
-                    bestAllFitness = fitness;
-                    std::cout << "Generation: " << generation << std::endl;
-                    cout << "Estrutura final encontrada, com diferença de volume = " << bestAllFitness << endl;
-                    parada = true;
-                    break;
+                    // o array all fitness tem os mesmos indices do array population
+                    // ou seja, 1o individuo é population[0] e allFitness[0]
+                    if (fitness < stopFitness && paradav1 == true)
+                    {
+                        bestAllFitness = fitness;
+                        std::cout << "Generation: " << generation << std::endl;
+                        cout << "Estrutura final encontrada, com diferença de volume = " << bestAllFitness << endl;
+                        parada = true;
+                        break;
+                    }
                 }
             }
         }
@@ -715,10 +715,13 @@ int main()
             int indice = bestFitness[i];
             std::vector<int> actualPopulation = population[indice];
             int qntMutation;
-            if (allFitness[0] > 100){
+            if (allFitness[0] > 100)
+            {
                 qntMutation = SELECTED;
-            } else {
-                qntMutation = SELECTED/2;
+            }
+            else
+            {
+                qntMutation = SELECTED / 2;
             }
             for (int i = 0; i < qntMutation; i++)
             {
