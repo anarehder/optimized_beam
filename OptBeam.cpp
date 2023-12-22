@@ -723,7 +723,7 @@ int main()
             {
                 qntMutation = SELECTED / 4;
             }
-            for (int i = 0; i < SELECTED/; i++)
+            for (int i = 0; i < SELECTED; i++)
             {
                 mutate(actualPopulation);
             }
