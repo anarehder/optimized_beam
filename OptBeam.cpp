@@ -717,13 +717,13 @@ int main()
             int qntMutation;
             if (allFitness[0] > 100)
             {
-                qntMutation = SELECTED;
+                qntMutation = SELECTED / 2;
             }
             else
             {
-                qntMutation = SELECTED / 2;
+                qntMutation = SELECTED / 4;
             }
-            for (int i = 0; i < qntMutation; i++)
+            for (int i = 0; i < SELECTED/; i++)
             {
                 mutate(actualPopulation);
             }
